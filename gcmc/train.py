@@ -397,7 +397,8 @@ best_epoch = 0
 wait = 0
 
 print('Training...')
-
+t=0
+total_time =0;
 for epoch in range(NB_EPOCH):
 
     t = time.time()
@@ -409,7 +410,7 @@ for epoch in range(NB_EPOCH):
 
     train_avg_loss = outs[1]
     train_rmse = outs[2]
-
+    
     val_avg_loss, val_rmse = sess.run([model.loss, model.rmse], feed_dict=val_feed_dict)
 
     if VERBOSE:
@@ -418,7 +419,9 @@ for epoch in range(NB_EPOCH):
               "val_loss=", "{:.5f}".format(val_avg_loss),
               "val_rmse=", "{:.5f}".format(val_rmse),
               "\t\ttime=", "{:.5f}".format(time.time() - t))
-
+    
+    total_time += (time.time()-t)
+    
     if val_rmse < best_val_score:
         best_val_score = val_rmse
         best_epoch = epoch
@@ -452,6 +455,8 @@ for epoch in range(NB_EPOCH):
         saver = tf.train.Saver()
         saver.restore(sess, save_path)
 
+total = t
+averagetime = (total_time/NB_EPOCH)
 
 # store model including exponential moving averages
 saver = tf.train.Saver()
@@ -460,7 +465,7 @@ save_path = saver.save(sess, "tmp/%s.ckpt" % model.name, global_step=model.globa
 
 if VERBOSE:
     print("\nOptimization Finished!")
-    print('best validation score =', best_val_score, 'at iteration', best_epoch)
+    print('best validation score =', best_val_score, 'at iteration', best_epoch, 'total_time',total, 'average time per epoch:', averagetime)
 
 
 if TESTING:
